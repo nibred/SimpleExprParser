@@ -1,2 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Interpreter;
+
+var parser = new Parser();
+var result = parser.Parse("3");
+Console.WriteLine(result);

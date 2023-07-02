@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Interpreter.Expressions;
 
-internal class Expression
+internal abstract class Expression
 {
+    public abstract int Interpret();
 }
