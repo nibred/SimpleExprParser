@@ -1,5 +1,5 @@
 ﻿using Interpreter;
 
 var parser = new Parser();
-var result = parser.Parse("3");
+string result = parser.Evaluate("2+(7-(2+5)");
 Console.WriteLine(result);
