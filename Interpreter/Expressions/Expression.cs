@@ -8,5 +8,5 @@ namespace Interpreter.Expressions;
 
 internal abstract class Expression
 {
-    public abstract int Interpret();
+    public abstract int Evaluate();
 }

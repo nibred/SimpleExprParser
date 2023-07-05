@@ -10,5 +10,5 @@ internal class SubtractionExpression : Expression
         _leftExpression = leftExpression;
         _rightExpression = rightExpression;
     }
-    public override int Interpret() => _leftExpression.Interpret() - _rightExpression.Interpret();
+    public override int Evaluate() => _leftExpression.Evaluate() - _rightExpression.Evaluate();
 }

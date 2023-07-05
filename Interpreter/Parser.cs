@@ -9,84 +9,120 @@ namespace Interpreter;
 
 internal class Parser
 {
-    public string Evaluate(string input)
+    private readonly Lexer _lexer;
+    public Parser()
     {
-        var expr = Scan(ref input);
-        return expr?.Interpret().ToString() ?? "Wrong expression";
+        _lexer = new Lexer();
     }
-    private Expression? Scan(ref string input)
+    public int Evaluate(string input)
     {
-        Stack<Expression> expressionStack = new();
-        Stack<char> operatorStack = new();
+        var result = _lexer.UseLexer(input);
+        return ParseTokens(result).Evaluate();
+    }
+
+    private Expression ParseTokens(TokenList tokenList)
+    {
+        Expression? result = null;
+        Token? current = tokenList?.FirstToken;
+        switch (current.TokenId)
+        {
+            case TokenId.TOKEN_NUMBER:
+                result = new NumberExpression(current.number);
+                current = current.Next;
+                return result;
+            default:
+                throw new Exception("Syntax error in expression");
+        }
+    }
+}
+
+enum TokenId
+{
+    TOKEN_NUMBER,
+    TOKEN_ADD,
+    TOKEN_SUB,
+    TOKEN_MUL,
+    TOKEN_END
+}
+
+internal record Token
+{
+    public Token? Next;
+    public TokenId TokenId;
+    public int number;
+}
+
+internal record TokenList
+{
+    public Token? FirstToken;
+    public Token? SecondToken;
+}
+
+internal class Lexer
+{
+    public TokenList UseLexer(string input)
+    {
+        TokenList list = new();
+        list.FirstToken = null;
+        list.SecondToken = null;
         int i = 0;
         while (i < input.Length)
         {
-            char c = input[i];
-            if (c is ' ' or '\t' or '\n' or '\r')
+            switch (input[i])
             {
-                i++;
-                continue;
-            }
-            if (c == '(')
-            {
-                operatorStack.Push(c);
-            }
-            if (char.IsDigit(c))
-            {
-                int value = c - '0';
-                while (i + 1 < input.Length && char.IsDigit(input[i + 1])) //FIXME overflow
-                {
-                    value *= 10;
-                    value += input[i + 1] - '0';
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
                     i++;
-                }
-                expressionStack.Push(new NumberExpression(value));
-            }
-            if (c is '+' or '-')
-            {
-                operatorStack.Push(c);
-            }
-            if (c == ')')
-            {
-                if (operatorStack.Count == 0)
-                    return null;
-                while (operatorStack.Count > 0 && operatorStack.Peek() != '(')
-                {
-                    char op = operatorStack.Pop();
-                    if (expressionStack.TryPop(out Expression? right) && expressionStack.TryPop(out Expression? left))
+                    continue;
+                case '+':
+                    EmitToken(ref list, TokenId.TOKEN_ADD);
+                    i++;
+                    continue;
+                case '-':
+                    EmitToken(ref list, TokenId.TOKEN_SUB);
+                    i++;
+                    continue;
+                case '*':
+                    EmitToken(ref list, TokenId.TOKEN_MUL);
+                    i++;
+                    continue;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    int value = 0;
+                    do
                     {
-                        Expression subExpression = CreateSubExpression(left, op, right);
-                        expressionStack.Push(subExpression);
-                    }
-                    else
-                        return null;
-                }
-                if (operatorStack.Count > 0 && operatorStack.Peek() == '(')
-                    operatorStack.Pop();
+                        value *= 10;
+                        value += input[i++] - '0';
+                    } while (i < input.Length && char.IsDigit(input[i]));
+                    EmitToken(ref list, TokenId.TOKEN_NUMBER, value);
+                    continue;
+                default:
+                    throw new ArgumentException();
             }
-            i++;
         }
-
-        while (operatorStack.Count > 0)
-        {
-            char op = operatorStack.Pop();
-            if (expressionStack.TryPop(out Expression? right) && expressionStack.TryPop(out Expression? left))
-            {
-                Expression subExpression = CreateSubExpression(left, op, right);
-                expressionStack.Push(subExpression);
-            }
-            else
-                return null;
-        }
-        if (expressionStack.Count > 0 && operatorStack.Count == 0)
-            return expressionStack.Pop();
-        return null;
+        EmitToken(ref list, TokenId.TOKEN_END);
+        return list;
     }
-
-    private Expression CreateSubExpression(Expression left, char op, Expression right) => op switch
+    private void EmitToken(ref TokenList tokenList, TokenId tokenId, int number = 0)
     {
-        '+' => new AdditionExpression(left, right),
-        '-' => new SubtractionExpression(left, right),
-        _ => throw new NotImplementedException()
-    };
+        Token token = new();
+        token.Next = null;
+        token.TokenId = tokenId;
+        token.number = number;
+        if (tokenList.FirstToken is null)
+            tokenList.FirstToken = token;
+        else
+            tokenList.SecondToken.Next = token;
+        tokenList.SecondToken = token;
+    }
 }
