@@ -16,31 +16,52 @@ internal class Parser
     }
     public int Evaluate(string input)
     {
-        var result = _lexer.UseLexer(input);
-        return ParseTokens(result).Evaluate();
+        var result = _lexer.GetTokens(input);
+        var head = result.FirstToken;
+        return AddExpression(ref head).Evaluate();
     }
 
-    private Expression ParseTokens(TokenList tokenList)
+    private Expression PrimaryExpression(ref Token? token)  
     {
         Expression? result = null;
-        Token? current = tokenList?.FirstToken;
-        switch (current.TokenId)
+        switch (token.TokenId)
         {
             case TokenId.TOKEN_NUMBER:
-                result = new NumberExpression(current.number);
-                current = current.Next;
+                result = new NumberExpression(token.number);
+                token = token.Next;
                 return result;
             default:
                 throw new Exception("Syntax error in expression");
         }
+    }
+
+    private Expression AddExpression(ref Token token)
+    {
+        Expression left = PrimaryExpression(ref token);
+        while (token.TokenId == TokenId.TOKEN_PLUS || token.TokenId == TokenId.TOKEN_MINUS)
+        {
+            var id = token.TokenId;
+            token = token.Next;
+            Expression right = PrimaryExpression(ref token);
+            switch (id)
+            {
+                case TokenId.TOKEN_PLUS:
+                    left = new AdditionExpression(left, right);
+                    break;
+                case TokenId.TOKEN_MINUS:
+                    left = new SubtractionExpression(left, right);
+                    break;
+            }
+        }
+        return left;
     }
 }
 
 enum TokenId
 {
     TOKEN_NUMBER,
-    TOKEN_ADD,
-    TOKEN_SUB,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
     TOKEN_MUL,
     TOKEN_END
 }
@@ -60,7 +81,7 @@ internal record TokenList
 
 internal class Lexer
 {
-    public TokenList UseLexer(string input)
+    public TokenList GetTokens(string input)
     {
         TokenList list = new();
         list.FirstToken = null;
@@ -77,11 +98,11 @@ internal class Lexer
                     i++;
                     continue;
                 case '+':
-                    EmitToken(ref list, TokenId.TOKEN_ADD);
+                    EmitToken(ref list, TokenId.TOKEN_PLUS);
                     i++;
                     continue;
                 case '-':
-                    EmitToken(ref list, TokenId.TOKEN_SUB);
+                    EmitToken(ref list, TokenId.TOKEN_MINUS);
                     i++;
                     continue;
                 case '*':
