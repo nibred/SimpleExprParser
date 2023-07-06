@@ -4,9 +4,11 @@ internal class Lexer
 {
     public TokenList GetTokens(string input)
     {
-        TokenList list = new();
-        list.FirstToken = null;
-        list.SecondToken = null;
+        TokenList list = new()
+        {
+            FirstToken = null,
+            SecondToken = null
+        };
         int i = 0;
         while (i < input.Length)
         {
@@ -69,10 +71,12 @@ internal class Lexer
     }
     private void EmitToken(ref TokenList tokenList, TokenId tokenId, int number = 0)
     {
-        Token token = new();
-        token.Next = null;
-        token.TokenId = tokenId;
-        token.number = number;
+        Token token = new()
+        {
+            Next = null,
+            TokenId = tokenId,
+            number = number
+        };
         if (tokenList.FirstToken is null)
             tokenList.FirstToken = token;
         else

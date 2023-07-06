@@ -14,7 +14,7 @@ public class Parser
         var tokenList = _lexer.GetTokens(input);
         var head = tokenList.FirstToken;
         var result = AddExpression(ref head).Evaluate();
-        if (head.TokenId != TokenId.TOKEN_END)
+        if (head?.TokenId != TokenId.TOKEN_END)
         {
             throw new Exception("syntax error");
         }
@@ -24,13 +24,13 @@ public class Parser
     private Expression PrimaryExpression(ref Token? token)
     {
         Expression? result;
-        switch (token.TokenId)
+        switch (token?.TokenId)
         {
             case TokenId.TOKEN_LBRACKET:
                 token = token.Next;
                 result = AddExpression(ref token);
-                if (token.TokenId is not TokenId.TOKEN_RBRACKET)
-                    throw new Exception("missing ')'");
+                if (token?.TokenId is not TokenId.TOKEN_RBRACKET)
+                    throw new ArgumentException("missing ')'");
                 token = token.Next;
                 return result;
             case TokenId.TOKEN_NUMBER:
@@ -38,14 +38,14 @@ public class Parser
                 token = token.Next;
                 return result;
             default:
-                throw new Exception("Syntax error in expression");
+                throw new ArgumentException();
         }
     }
 
     private Expression AddExpression(ref Token? token)
     {
         Expression left = MultiExpression(ref token);
-        while (token.TokenId is TokenId.TOKEN_PLUS or TokenId.TOKEN_MINUS)
+        while (token?.TokenId is TokenId.TOKEN_PLUS or TokenId.TOKEN_MINUS)
         {
             var id = token.TokenId;
             token = token.Next;
@@ -66,7 +66,7 @@ public class Parser
     private Expression MultiExpression(ref Token? token)
     {
         Expression left = PrimaryExpression(ref token);
-        while (token.TokenId is TokenId.TOKEN_MULTIPLY or TokenId.TOKEN_SLASH)
+        while (token?.TokenId is TokenId.TOKEN_MULTIPLY or TokenId.TOKEN_SLASH)
         {
             var id = token.TokenId;
             token = token.Next;

@@ -1,14 +1,16 @@
-namespace Interpreter.Test
+using Interpreter;
+
+namespace ExprParser.Test
 {
-    public class UnitTest1
+    public class UnitTest
     {
         [Theory]
-        [InlineData("2 +   2", 2+2)]
-        [InlineData("2*  2", 2*2)]
-        [InlineData("2 + 2   *2", 2 + 2 * 2)]
+        [InlineData("2 +   2", 2 + 2)]
+        [InlineData("2*  2", 2 * 2)]
+        [InlineData("2 + 2   *2", 2 + (2 * 2))]
         [InlineData("2 +( 510  -  3)", 2 + (510 - 3))]
-        [InlineData("  12-  32", 12 - 32)]
-        [InlineData("4+43*(34   -3*4)-5+7-(4\t*3+(4-  2)  -6/3)", 4 + 43 * (34 - 3 * 4) - 5 + 7 - (4 * 3 + (4 - 2) - 6 / 3))]
+        [InlineData("  12- \t32", 12 - 32)]
+        [InlineData("4+43*(34   -3*4)-5+7-(4\t*3+(4-  2)  -6/3)", 4 + (43 * (34 - (3 * 4))) - 5 + 7 - ((4 * 3) + (4 - 2) - (6 / 3)))]
         public void TestEqual(string value, int result)
         {
             var parser = new Parser();
@@ -30,7 +32,7 @@ namespace Interpreter.Test
         public void TestException(string value)
         {
             var parser = new Parser();
-            Assert.Throws<Exception>(() => parser.Evaluate(value));
+            Assert.Throws<ArgumentException>(() => parser.Evaluate(value));
         }
 
         [Theory]
