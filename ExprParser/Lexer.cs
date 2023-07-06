@@ -1,7 +1,4 @@
 ﻿namespace ExprParser;
-
-namespace ExprParser;
-
 internal class Lexer
 {
     public TokenList GetTokens(string input)

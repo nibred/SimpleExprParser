@@ -5,6 +5,7 @@ namespace ExprParser.Test
         [Theory]
         [InlineData("2 +   2", 2 + 2)]
         [InlineData("2*  2", 2 * 2)]
+        [InlineData("2/  3", 2 / 3)]
         [InlineData("2 + 2   *2", 2 + (2 * 2))]
         [InlineData("2 +( 510  -  3)", 2 + (510 - 3))]
         [InlineData("  12- \t32", 12 - 32)]
