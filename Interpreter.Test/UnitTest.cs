@@ -1,5 +1,3 @@
-using Interpreter;
-
 namespace ExprParser.Test
 {
     public class UnitTest
