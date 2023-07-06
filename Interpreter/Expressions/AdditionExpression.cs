@@ -1,4 +1,4 @@
-﻿namespace Interpreter.Expressions;
+﻿namespace ExprParser.Expressions;
 
 internal class AdditionExpression : Expression
 {

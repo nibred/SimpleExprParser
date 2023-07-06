@@ -1,4 +1,4 @@
-﻿namespace Interpreter;
+﻿namespace ExprParser;
 
 internal record Token
 {

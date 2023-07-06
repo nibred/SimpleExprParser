@@ -1,6 +1,6 @@
-﻿using Interpreter.Expressions;
+﻿using ExprParser.Expressions;
 
-namespace Interpreter;
+namespace ExprParser;
 
 public class Parser
 {
