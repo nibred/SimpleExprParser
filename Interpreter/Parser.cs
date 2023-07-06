@@ -1,13 +1,8 @@
 ﻿using Interpreter.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Interpreter;
 
-internal class Parser
+public class Parser
 {
     private readonly Lexer _lexer;
     public Parser()
@@ -26,15 +21,15 @@ internal class Parser
         return result;
     }
 
-    private Expression PrimaryExpression(ref Token? token)  
+    private Expression PrimaryExpression(ref Token? token)
     {
-        Expression? result = null;
+        Expression? result;
         switch (token.TokenId)
         {
             case TokenId.TOKEN_LBRACKET:
                 token = token.Next;
-                result = MultiExpression(ref token);
-                if (token.TokenId != TokenId.TOKEN_RBRACKET)
+                result = AddExpression(ref token);
+                if (token.TokenId is not TokenId.TOKEN_RBRACKET)
                     throw new Exception("missing ')'");
                 token = token.Next;
                 return result;
@@ -50,7 +45,7 @@ internal class Parser
     private Expression AddExpression(ref Token? token)
     {
         Expression left = MultiExpression(ref token);
-        while (token.TokenId == TokenId.TOKEN_PLUS || token.TokenId == TokenId.TOKEN_MINUS)
+        while (token.TokenId is TokenId.TOKEN_PLUS or TokenId.TOKEN_MINUS)
         {
             var id = token.TokenId;
             token = token.Next;
@@ -71,7 +66,7 @@ internal class Parser
     private Expression MultiExpression(ref Token? token)
     {
         Expression left = PrimaryExpression(ref token);
-        while (token.TokenId == TokenId.TOKEN_MULTIPLY || token.TokenId == TokenId.TOKEN_SLASH)
+        while (token.TokenId is TokenId.TOKEN_MULTIPLY or TokenId.TOKEN_SLASH)
         {
             var id = token.TokenId;
             token = token.Next;
