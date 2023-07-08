@@ -1,11 +1,11 @@
 ﻿namespace ExprParser.Expressions;
 
-internal class DivideExpression : Expression
+internal class DivExpression : Expression
 {
     private Expression _leftExpression;
     private Expression _rightExpression;
 
-    public DivideExpression(Expression leftExpression, Expression rightExpression)
+    public DivExpression(Expression leftExpression, Expression rightExpression)
     {
         _leftExpression = leftExpression;
         _rightExpression = rightExpression;

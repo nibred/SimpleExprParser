@@ -1,11 +1,11 @@
 ﻿namespace ExprParser.Expressions;
 
-internal class AdditionExpression : Expression
+internal class AddExpression : Expression
 {
     private Expression _leftExpression;
     private Expression _rightExpression;
 
-    public AdditionExpression(Expression leftExpression, Expression rightExpression)
+    public AddExpression(Expression leftExpression, Expression rightExpression)
     {
         _leftExpression = leftExpression;
         _rightExpression = rightExpression;

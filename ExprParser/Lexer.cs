@@ -6,64 +6,68 @@ internal class Lexer
         TokenList list = new()
         {
             FirstToken = null,
-            SecondToken = null
+            LastToken = null
         };
         int i = 0;
         while (i < input.Length)
         {
+            if (char.IsWhiteSpace(input[i]))
+            {
+                i++;
+                continue;
+            }
             switch (input[i])
             {
-                case ' ':
-                case '\t':
-                case '\n':
-                case '\r':
-                    i++;
-                    continue;
                 case '+':
                     EmitToken(ref list, TokenId.TOKEN_PLUS);
-                    i++;
-                    continue;
+                    break;
                 case '-':
                     EmitToken(ref list, TokenId.TOKEN_MINUS);
-                    i++;
-                    continue;
+                    break;
                 case '*':
                     EmitToken(ref list, TokenId.TOKEN_MULTIPLY);
-                    i++;
-                    continue;
+                    break;
                 case '/':
                     EmitToken(ref list, TokenId.TOKEN_SLASH);
-                    i++;
-                    continue;
+                    break;
+                case '%':
+                    EmitToken(ref list, TokenId.TOKEN_PERCENT);
+                    break;
                 case '(':
                     EmitToken(ref list, TokenId.TOKEN_LBRACKET);
-                    i++;
-                    continue;
+                    break;
                 case ')':
                     EmitToken(ref list, TokenId.TOKEN_RBRACKET);
+                    break;
+                case '=':
+                    EmitToken(ref list, TokenId.TOKEN_EQUAL);
+                    break;
+                case '!':
                     i++;
-                    continue;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    int value = 0;
-                    do
+                    switch (input[i])
                     {
-                        value *= 10;
-                        value += input[i++] - '0';
-                    } while (i < input.Length && char.IsDigit(input[i]));
-                    EmitToken(ref list, TokenId.TOKEN_NUMBER, value);
-                    continue;
+                        case '=':
+                            EmitToken(ref list, TokenId.TOKEN_NOT_EQUAL);
+                            break;
+                        default:
+                            throw new ArgumentException();
+                    }
+                    break;
                 default:
+                    if (char.IsDigit(input[i]))
+                    {
+                        int value = 0;
+                        do
+                        {
+                            value *= 10;
+                            value += input[i++] - '0';
+                        } while (i < input.Length && char.IsDigit(input[i]));
+                        EmitToken(ref list, TokenId.TOKEN_NUMBER, value);
+                        continue;
+                    }
                     throw new ArgumentException();
             }
+            i++;
         }
         EmitToken(ref list, TokenId.TOKEN_END);
         return list;
@@ -79,7 +83,7 @@ internal class Lexer
         if (tokenList.FirstToken is null)
             tokenList.FirstToken = token;
         else
-            tokenList.SecondToken.Next = token;
-        tokenList.SecondToken = token;
+            tokenList.LastToken.Next = token;
+        tokenList.LastToken = token;
     }
 }

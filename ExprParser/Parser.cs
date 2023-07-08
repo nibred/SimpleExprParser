@@ -13,28 +13,28 @@ public class Parser
     {
         var tokenList = _lexer.GetTokens(input);
         var head = tokenList.FirstToken;
-        var result = AddExpression(ref head).Evaluate();
+        var result = EqualExpr(ref head).Evaluate();
         if (head?.TokenId != TokenId.TOKEN_END)
         {
-            throw new Exception("syntax error");
+            throw new ArgumentException();
         }
         return result;
     }
 
-    private Expression PrimaryExpression(ref Token? token)
+    private Expression PrimaryExpr(ref Token? token)
     {
         Expression? result;
         switch (token?.TokenId)
         {
             case TokenId.TOKEN_LBRACKET:
                 token = token.Next;
-                result = AddExpression(ref token);
+                result = AddExpr(ref token);
                 if (token?.TokenId is not TokenId.TOKEN_RBRACKET)
                     throw new ArgumentException("missing ')'");
                 token = token.Next;
                 return result;
             case TokenId.TOKEN_NUMBER:
-                result = new NumberExpression(token.number);
+                result = new NumExpression(token.number);
                 token = token.Next;
                 return result;
             default:
@@ -42,42 +42,68 @@ public class Parser
         }
     }
 
-    private Expression AddExpression(ref Token? token)
+    private Expression AddExpr(ref Token? token)
     {
-        Expression left = MultiExpression(ref token);
+        Expression left = MultiExpr(ref token);
         while (token?.TokenId is TokenId.TOKEN_PLUS or TokenId.TOKEN_MINUS)
         {
             var id = token.TokenId;
             token = token.Next;
-            Expression right = MultiExpression(ref token);
+            Expression right = MultiExpr(ref token);
             switch (id)
             {
                 case TokenId.TOKEN_PLUS:
-                    left = new AdditionExpression(left, right);
+                    left = new AddExpression(left, right);
                     break;
                 case TokenId.TOKEN_MINUS:
-                    left = new SubtractionExpression(left, right);
+                    left = new SubExpression(left, right);
                     break;
             }
         }
         return left;
     }
 
-    private Expression MultiExpression(ref Token? token)
+    private Expression MultiExpr(ref Token? token)
     {
-        Expression left = PrimaryExpression(ref token);
-        while (token?.TokenId is TokenId.TOKEN_MULTIPLY or TokenId.TOKEN_SLASH)
+        Expression left = PrimaryExpr(ref token);
+        while (token?.TokenId is TokenId.TOKEN_MULTIPLY 
+            or TokenId.TOKEN_SLASH 
+            or TokenId.TOKEN_PERCENT)
         {
             var id = token.TokenId;
             token = token.Next;
-            Expression right = PrimaryExpression(ref token);
+            Expression right = PrimaryExpr(ref token);
             switch (id)
             {
                 case TokenId.TOKEN_MULTIPLY:
-                    left = new MultiplyExpression(left, right);
+                    left = new MultExpression(left, right);
                     break;
                 case TokenId.TOKEN_SLASH:
-                    left = new DivideExpression(left, right);
+                    left = new DivExpression(left, right);
+                    break;
+                case TokenId.TOKEN_PERCENT:
+                    left = new RemExpression(left, right);
+                    break;
+            }
+        }
+        return left;
+    }
+
+    private Expression EqualExpr(ref Token? token)
+    {
+        Expression left = AddExpr(ref token);
+        while (token?.TokenId is TokenId.TOKEN_EQUAL or TokenId.TOKEN_NOT_EQUAL)
+        {
+            var id = token.TokenId;
+            token = token.Next;
+            Expression right = AddExpr(ref token);
+            switch (id)
+            {
+                case TokenId.TOKEN_EQUAL:
+                    left = new EqualExpression(left, right);
+                    break;
+                case TokenId.TOKEN_NOT_EQUAL:
+                    left = new NotEqualExpression(left, right);
                     break;
             }
         }

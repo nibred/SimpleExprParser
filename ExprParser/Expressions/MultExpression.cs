@@ -1,11 +1,11 @@
 ﻿namespace ExprParser.Expressions;
 
-internal class MultiplyExpression : Expression
+internal class MultExpression : Expression
 {
     private Expression _leftExpression;
     private Expression _rightExpression;
 
-    public MultiplyExpression(Expression leftExpression, Expression rightExpression)
+    public MultExpression(Expression leftExpression, Expression rightExpression)
     {
         _leftExpression = leftExpression;
         _rightExpression = rightExpression;

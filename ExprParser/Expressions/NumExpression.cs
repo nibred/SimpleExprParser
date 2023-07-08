@@ -1,8 +1,8 @@
 ﻿namespace ExprParser.Expressions;
 
-internal class NumberExpression : Expression
+internal class NumExpression : Expression
 {
     private int _number;
-    public NumberExpression(int number) => _number = number;
+    public NumExpression(int number) => _number = number;
     public override int Evaluate() => _number;
 }
